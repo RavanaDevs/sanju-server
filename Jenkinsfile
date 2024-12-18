@@ -53,9 +53,9 @@ echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.
 tee /etc/apt/sources.list.d/docker.list > /dev/null
 apt-get update -y
 apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-compose awscli unzip -y
-mkdir -p /opt/deploy
+mkdir -p /home/ubuntu/deploy
 cd /opt/deploy
-aws s3 cp s3://${S3_BUCKET}/${ZIP_FILE_NAME} /opt/deploy/${ZIP_FILE_NAME}
+aws s3 cp s3://${S3_BUCKET}/${ZIP_FILE_NAME} /home/ubuntu/deploy/${ZIP_FILE_NAME}
 unzip ${ZIP_FILE_NAME}
 docker-compose up -d
 EOF
