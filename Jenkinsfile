@@ -42,22 +42,25 @@ pipeline {
                         --version-description "Deployed new app version from Jenkins" \
                         --source-version 1 \
                         --launch-template-data '{
-                            "UserData": "$(echo -n '
+                            "UserData": "'$(base64 -w0 << EOF
 #!/bin/bash
 apt-get update -y
-apt-get install ca-certificates curl -y
-install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-chmod a+r /etc/apt/keyrings/docker.asc
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+install apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable" -y
 apt-get update -y
-apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-compose awscli unzip -y
+apt-cache policy docker-ce
+apt install docker-ce -y
+apt install docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-compose -y
+apt-get install awscli unzip -y
 mkdir -p /home/ubuntu/deploy
 cd /home/ubuntu/deploy
 aws s3 cp s3://${S3_BUCKET}/${ZIP_FILE_NAME} /home/ubuntu/deploy/${ZIP_FILE_NAME}
+aws s3 cp s3://${S3_BUCKET}/.env /home/ubuntu/deploy/.env
 unzip ${ZIP_FILE_NAME}
 docker-compose up -d
-' | base64)" 
+EOF
+)'"
                         }'
                     '''
                 }
