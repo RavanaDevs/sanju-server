@@ -42,7 +42,7 @@ pipeline {
                         --version-description "Deployed new app version from Jenkins" \
                         --source-version 1 \
                         --launch-template-data '{
-                            "UserData": $(echo -n '
+                            "UserData": "'$(echo -n '
 #!/bin/bash
 apt-get update -y
 apt-get install ca-certificates curl -y
@@ -57,7 +57,7 @@ cd /home/ubuntu/deploy
 aws s3 cp s3://${S3_BUCKET}/${ZIP_FILE_NAME} /home/ubuntu/deploy/${ZIP_FILE_NAME}
 unzip ${ZIP_FILE_NAME}
 docker-compose up -d
-' | base64)
+' | base64)'"
                         }'
                     '''
                 }
